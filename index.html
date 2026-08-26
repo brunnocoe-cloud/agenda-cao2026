@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAO II/26 · Agenda Acadêmica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 100 100" class="badge-svg">
+          <polygon points="50,4 92,20 92,55 50,96 8,55 8,20" fill="none" stroke="var(--gold)" stroke-width="3"/>
+          <polygon points="50,10 86,24 86,52 50,88 14,52 14,24" fill="none" stroke="var(--gold)" stroke-width="1.2"/>
+          <circle cx="50" cy="46" r="14" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+          <polygon points="50,37 52.6,43.8 60,44.3 54.3,48.9 56.2,56 50,51.9 43.8,56 45.7,48.9 40,44.3 47.4,43.8" fill="var(--gold)"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <strong>CAO II/26</strong>
+        <span>CESP · PMMG</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-view="dashboard">
+        <span class="nav-ico">◈</span> Painel
+      </button>
+      <button class="nav-item" data-view="agenda">
+        <span class="nav-ico">▦</span> Agenda
+      </button>
+      <button class="nav-item" data-view="trabalhos">
+        <span class="nav-ico">✎</span> Trabalhos
+      </button>
+      <button class="nav-item" data-view="horarios">
+        <span class="nav-ico">◷</span> Horários
+      </button>
+      <button class="nav-item" data-view="disciplinas">
+        <span class="nav-ico">✚</span> Disciplinas
+      </button>
+    </nav>
+
+    <div class="drive-widget">
+      <a id="drive-link" class="btn btn-ghost btn-sm drive-btn" href="#" target="_blank" rel="noopener">📁 Material didático</a>
+      <button class="icon-btn" id="drive-edit-btn" title="Definir/editar link do Google Drive">✎</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <p>Aperfeiçoamento e liderança<br>estratégica rumo ao oficialato<br>superior na PMMG</p>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <header class="topbar">
+      <h1 id="view-title">Painel</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" id="export-btn" title="Exportar dados (backup)">Exportar</button>
+        <label class="btn btn-ghost" title="Importar dados (backup)">
+          Importar
+          <input type="file" id="import-input" accept="application/json" hidden>
+        </label>
+        <button class="btn btn-primary" id="new-task-btn">+ Novo trabalho</button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="view" id="view-dashboard">
+      <div class="stats-row" id="stats-row"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Próximos prazos</h2>
+        </div>
+        <div class="deadline-grid" id="deadline-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Hoje</h2>
+          <span class="muted" id="today-label"></span>
+        </div>
+        <div class="today-list" id="today-list"></div>
+      </div>
+    </section>
+
+    <!-- AGENDA (CALENDAR) -->
+    <section class="view hidden" id="view-agenda">
+      <div class="panel">
+        <div class="panel-head calendar-head">
+          <button class="icon-btn" id="cal-prev">‹</button>
+          <h2 id="cal-month-label">Mês</h2>
+          <button class="icon-btn" id="cal-next">›</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+    </section>
+
+    <!-- TRABALHOS (TASKS) -->
+    <section class="view hidden" id="view-trabalhos">
+      <div class="panel">
+        <div class="panel-head filters-head">
+          <h2>Todos os trabalhos</h2>
+          <div class="filters">
+            <select id="filter-disciplina"><option value="">Todas as disciplinas</option></select>
+            <select id="filter-status">
+              <option value="">Todos os status</option>
+              <option value="pendente">Pendente</option>
+              <option value="concluido">Concluído</option>
+            </select>
+          </div>
+        </div>
+        <div class="task-table-wrap">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Trabalho</th>
+                <th>Disciplina</th>
+                <th>Tipo</th>
+                <th>Entrega</th>
+                <th>Restam</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="task-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- HORARIOS (WEEKLY SCHEDULE) -->
+    <section class="view hidden" id="view-horarios">
+      <div class="panel">
+        <div class="panel-head schedule-head">
+          <h2>Grade semanal de aulas</h2>
+          <div class="week-nav">
+            <button class="icon-btn" id="sch-prev">‹</button>
+            <span class="week-label" id="sch-week-label">Semana</span>
+            <button class="icon-btn" id="sch-next">›</button>
+          </div>
+          <button class="btn btn-primary btn-sm" id="new-horario-btn">+ Novo horário</button>
+        </div>
+        <div class="schedule-wrap">
+          <div class="schedule-grid" id="schedule-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DISCIPLINAS -->
+    <section class="view hidden" id="view-disciplinas">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Disciplinas</h2>
+          <div class="button-group">
+            <button class="btn btn-ghost btn-sm" id="load-catalog-btn">Carregar lista oficial de docentes</button>
+            <button class="btn btn-primary btn-sm" id="new-disciplina-btn">+ Nova disciplina</button>
+          </div>
+        </div>
+        <div class="discipline-grid" id="discipline-grid"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL: Task -->
+<div class="modal-overlay hidden" id="task-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="task-modal-title">Novo trabalho</h3>
+      <button class="icon-btn" data-close="task-modal">×</button>
+    </div>
+    <form id="task-form">
+      <input type="hidden" id="task-id">
+      <label>Título
+        <input type="text" id="task-titulo" required placeholder="Ex.: Artigo científico — Gestão de Crises">
+      </label>
+      <label>Disciplina
+        <select id="task-disciplina" required></select>
+      </label>
+      <div class="form-row">
+        <label>Tipo
+          <select id="task-tipo">
+            <option value="trabalho">Trabalho</option>
+            <option value="artigo">Artigo</option>
+            <option value="seminario">Seminário</option>
+            <option value="prova">Prova</option>
+            <option value="apresentacao">Apresentação</option>
+            <option value="leitura">Leitura</option>
+          </select>
+        </label>
+        <label>Data de entrega
+          <input type="date" id="task-data" required>
+        </label>
+      </div>
+      <label>Observações
+        <textarea id="task-obs" rows="3" placeholder="Detalhes, critérios, formato de entrega..."></textarea>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="task-concluido"> Já concluído
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-danger" id="task-delete-btn" hidden>Excluir</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-ghost" data-close="task-modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: Disciplina -->
+<div class="modal-overlay hidden" id="disciplina-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="disciplina-modal-title">Nova disciplina</h3>
+      <button class="icon-btn" data-close="disciplina-modal">×</button>
+    </div>
+    <form id="disciplina-form">
+      <input type="hidden" id="disciplina-id">
+      <label>Nome da disciplina
+        <input type="text" id="disciplina-nome" required placeholder="Ex.: Liderança Estratégica">
+      </label>
+      <label>Professor(a) / instrutor(a)
+        <input type="text" id="disciplina-professor" placeholder="Opcional">
+      </label>
+      <label>Link do Google Drive (material didático)
+        <input type="url" id="disciplina-drive" placeholder="https://drive.google.com/...">
+      </label>
+      <label>Cor de identificação
+        <div class="color-swatches" id="color-swatches"></div>
+        <input type="hidden" id="disciplina-cor" value="#c9a13d">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-danger" id="disciplina-delete-btn" hidden>Excluir</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-ghost" data-close="disciplina-modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: Horario -->
+<div class="modal-overlay hidden" id="horario-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="horario-modal-title">Novo horário</h3>
+      <button class="icon-btn" data-close="horario-modal">×</button>
+    </div>
+    <form id="horario-form">
+      <input type="hidden" id="horario-id">
+      <input type="hidden" id="horario-semana">
+      <input type="hidden" id="horario-disciplina">
+      <label>Disciplina
+        <input type="text" id="horario-disciplina-search" placeholder="Buscar disciplina...">
+        <div class="discipline-picker" id="horario-discipline-picker"></div>
+      </label>
+      <div class="form-row">
+        <label>Dia da semana
+          <select id="horario-dia">
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+          </select>
+        </label>
+        <label>Aula / horário
+          <select id="horario-slot">
+            <option value="1">1ª aula · 08h30–10h10</option>
+            <option value="2">2ª aula · 10h30–12h10</option>
+            <option value="3">3ª aula · 13h20–15h00</option>
+            <option value="4">4ª aula · 15h20–17h00</option>
+          </select>
+        </label>
+      </div>
+      <label>Local / sala
+        <input type="text" id="horario-local" placeholder="Opcional">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-danger" id="horario-delete-btn" hidden>Excluir</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-ghost" data-close="horario-modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="day-popover hidden" id="day-popover"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
