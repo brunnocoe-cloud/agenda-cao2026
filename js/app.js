@@ -27,11 +27,7 @@
     { nome:'Metodologia de Pesquisa II', professor:'Silvio José de Sousa Filho' },
     { nome:'Planejamento Estratégico e Trabalho de Comando', professor:'Ricardo Belini Muffato de Souza' },
     { nome:'Políticas Públicas e Segurança Pública', professor:'Adriano Sérgio Lopes da Gama Cerqueira' },
-    { nome:'Saúde Integral na gestão de equipes e qualidade de vida na tropa', professor:'Patrícia Calado Pena' },
-    { nome:'Tecnologia da Informação', professor:'' },
-    { nome:'Seminário de Boas Práticas em Ciências Policiais', professor:'' },
-    { nome:'Tópicos Contemporâneos: Inteligência, Segurança e Defesa', professor:'' },
-    { nome:'Sociologia do Crime e da Violência', professor:'' }
+    { nome:'Saúde Integral na gestão de equipes e qualidade de vida na tropa', professor:'Patrícia Calado Pena' }
   ];
 
   const DEFAULT_STATE = {
