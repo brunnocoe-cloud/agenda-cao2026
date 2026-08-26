@@ -9,10 +9,10 @@
 //      registre um app e copie o objeto de configuração para cá, substituindo
 //      os valores abaixo.
 window.FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyABpNVrNcDe01id876upw8FypKzTZPCbJc",
+  authDomain: "agenda-cao2026.firebaseapp.com",
+  projectId: "agenda-cao2026",
+  storageBucket: "agenda-cao2026.firebasestorage.app",
+  messagingSenderId: "978239986332",
+  appId: "1:978239986332:web:8595f58ecd1a1841866b59"
 };
