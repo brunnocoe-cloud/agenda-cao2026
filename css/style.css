@@ -99,14 +99,10 @@ input,select,textarea{font-family:inherit;}
 }
 .nav-item.active .nav-ico{color:var(--gold);}
 
-.drive-widget{
-  display:flex;align-items:center;gap:8px;
-  padding-top:16px;
-  border-top:1px solid var(--border-soft);
-  margin-top:16px;
-}
-.drive-btn{flex:1;justify-content:center;text-decoration:none;}
-.drive-btn.disabled{opacity:.5;cursor:pointer;}
+.nav-item-row{display:flex;align-items:center;gap:4px;}
+.nav-item-link{flex:1;text-decoration:none;}
+.nav-item-link.disabled{opacity:.5;}
+.nav-edit-btn{flex:none;}
 
 .sidebar-footer{
   padding-top:16px;
