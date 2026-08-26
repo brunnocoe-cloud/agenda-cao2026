@@ -65,7 +65,7 @@ input,select,textarea{font-family:inherit;}
   align-items:center;
   justify-content:center;
   gap:12px;
-  padding-bottom:22px;
+  padding-bottom:24px;
   margin-bottom:18px;
   border-bottom:1px solid var(--border-soft);
 }
