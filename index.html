@@ -284,10 +284,22 @@
       <input type="hidden" id="horario-id">
       <input type="hidden" id="horario-semana">
       <input type="hidden" id="horario-disciplina">
-      <label>Disciplina
-        <input type="text" id="horario-disciplina-search" placeholder="Buscar disciplina...">
-        <div class="discipline-picker" id="horario-discipline-picker"></div>
-      </label>
+      <input type="hidden" id="horario-tipo" value="disciplina">
+      <div class="type-toggle" id="horario-tipo-toggle">
+        <button type="button" class="type-toggle-btn active" data-tipo="disciplina">Disciplina</button>
+        <button type="button" class="type-toggle-btn" data-tipo="extra">Atividade extra</button>
+      </div>
+      <div id="horario-disciplina-fields">
+        <label>Disciplina
+          <input type="text" id="horario-disciplina-search" placeholder="Buscar disciplina...">
+          <div class="discipline-picker" id="horario-discipline-picker"></div>
+        </label>
+      </div>
+      <div id="horario-extra-fields" class="hidden">
+        <label>Atividade
+          <input type="text" id="horario-extra-titulo" placeholder="Ex.: Reunião com a Comandante Geral">
+        </label>
+      </div>
       <div class="form-row">
         <label>Dia da semana
           <select id="horario-dia">

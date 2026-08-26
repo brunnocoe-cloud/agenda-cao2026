@@ -275,9 +275,9 @@
         const slotInfo = SLOTS.find(s => s.id === Number(h.slot));
         return `
         <div class="today-item">
-          <span class="today-dot" style="background:${disciplinaColor(h.disciplinaId)}"></span>
+          <span class="today-dot" style="background:${horarioColor(h)}"></span>
           <span class="today-time">${slotInfo ? slotInfo.inicio+' – '+slotInfo.fim : ''}</span>
-          <span class="today-name">${escapeHtml(disciplinaName(h.disciplinaId))}</span>
+          <span class="today-name">${escapeHtml(horarioLabel(h))}</span>
           <span class="today-place">${escapeHtml(h.local||'')}</span>
         </div>
       `;
@@ -861,10 +861,19 @@
     3: 'Intervalo · 15h00 – 15h20'
   };
 
+  const EXTRA_COLOR = '#5f7fa6';
+
   let schCursor = todayMidnight(); // qualquer data dentro da semana exibida
 
   function findHorario(semana, dia, slot){
     return state.horarios.find(h => h.semana === semana && Number(h.dia) === Number(dia) && Number(h.slot) === Number(slot));
+  }
+
+  function horarioLabel(h){
+    return h.tipo === 'extra' ? h.titulo : disciplinaName(h.disciplinaId);
+  }
+  function horarioColor(h){
+    return h.tipo === 'extra' ? EXTRA_COLOR : disciplinaColor(h.disciplinaId);
   }
 
   function renderSchedule(){
@@ -887,8 +896,8 @@
         if(h){
           html += `
             <div class="sch-daycell filled" data-edit-horario="${h.id}">
-              <div class="sch-event" style="background:${disciplinaColor(h.disciplinaId)}">
-                ${escapeHtml(disciplinaName(h.disciplinaId))}
+              <div class="sch-event ${h.tipo === 'extra' ? 'extra' : ''}" style="background:${horarioColor(h)}">
+                ${escapeHtml(horarioLabel(h))}
                 ${h.local ? `<span>${escapeHtml(h.local)}</span>` : ''}
               </div>
             </div>`;
@@ -921,12 +930,18 @@
   const horarioModal = $('#horario-modal');
   const horarioForm = $('#horario-form');
 
+  function setHorarioTipo(tipo){
+    $('#horario-tipo').value = tipo;
+    $$('.type-toggle-btn', $('#horario-tipo-toggle')).forEach(b => b.classList.toggle('active', b.dataset.tipo === tipo));
+    $('#horario-disciplina-fields').classList.toggle('hidden', tipo !== 'disciplina');
+    $('#horario-extra-fields').classList.toggle('hidden', tipo !== 'extra');
+  }
+
+  $$('.type-toggle-btn', $('#horario-tipo-toggle')).forEach(btn => {
+    btn.addEventListener('click', () => setHorarioTipo(btn.dataset.tipo));
+  });
+
   function openHorarioModal(id, presetDia, presetSlot){
-    if(state.disciplinas.length === 0){
-      alert('Cadastre ao menos uma disciplina antes de definir um horário.');
-      switchView('disciplinas');
-      return;
-    }
     refreshDisciplinaFilters();
     horarioForm.reset();
     const isEdit = !!id;
@@ -937,16 +952,20 @@
       const h = state.horarios.find(x => x.id === id);
       $('#horario-id').value = h.id;
       $('#horario-semana').value = h.semana;
-      $('#horario-disciplina').value = h.disciplinaId;
+      $('#horario-disciplina').value = h.disciplinaId || '';
+      $('#horario-extra-titulo').value = h.tipo === 'extra' ? (h.titulo || '') : '';
       $('#horario-dia').value = h.dia;
       $('#horario-slot').value = h.slot;
       $('#horario-local').value = h.local || '';
+      setHorarioTipo(h.tipo === 'extra' ? 'extra' : 'disciplina');
     } else {
       $('#horario-id').value = '';
       $('#horario-disciplina').value = '';
+      $('#horario-extra-titulo').value = '';
       $('#horario-semana').value = toISO(mondayOf(schCursor));
       if(presetDia) $('#horario-dia').value = presetDia;
       if(presetSlot) $('#horario-slot').value = presetSlot;
+      setHorarioTipo('disciplina');
     }
     $('#horario-disciplina-search').value = '';
     renderHorarioDisciplinePicker($('#horario-disciplina').value, '');
@@ -955,8 +974,13 @@
 
   horarioForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    if(!$('#horario-disciplina').value){
+    const tipo = $('#horario-tipo').value;
+    if(tipo === 'disciplina' && !$('#horario-disciplina').value){
       alert('Selecione uma disciplina na lista.');
+      return;
+    }
+    if(tipo === 'extra' && !$('#horario-extra-titulo').value.trim()){
+      alert('Escreva o nome da atividade.');
       return;
     }
     const id = $('#horario-id').value || uid();
@@ -966,17 +990,13 @@
 
     const existing = findHorario(semana, dia, slot);
     if(existing && existing.id !== id){
-      if(!confirm(`Já existe "${disciplinaName(existing.disciplinaId)}" nesse horário. Substituir?`)) return;
+      if(!confirm(`Já existe "${horarioLabel(existing)}" nesse horário. Substituir?`)) return;
       state.horarios = state.horarios.filter(h => h.id !== existing.id);
     }
 
-    const payload = {
-      id,
-      semana,
-      disciplinaId: $('#horario-disciplina').value,
-      dia, slot,
-      local: $('#horario-local').value.trim()
-    };
+    const payload = tipo === 'extra'
+      ? { id, semana, tipo, titulo: $('#horario-extra-titulo').value.trim(), dia, slot, local: $('#horario-local').value.trim() }
+      : { id, semana, tipo, disciplinaId: $('#horario-disciplina').value, dia, slot, local: $('#horario-local').value.trim() };
     const idx = state.horarios.findIndex(h => h.id === id);
     if(idx >= 0) state.horarios[idx] = payload; else state.horarios.push(payload);
     saveState();
