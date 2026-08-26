@@ -199,7 +199,7 @@
     if(view === 'agenda') renderCalendar();
     if(view === 'trabalhos') renderTaskTable();
     if(view === 'horarios') renderSchedule();
-    if(view === 'disciplinas') renderDisciplines();
+    if(view === 'disciplinas'){ renderDisciplines(); renderCargaHoraria(); startChAutoRefresh(); } else { stopChAutoRefresh(); }
     if(view === 'dashboard') renderDashboard();
   }
 
@@ -561,6 +561,157 @@
   });
 
   $('#new-task-btn').addEventListener('click', () => openTaskModal(null));
+
+  /* ================= CARGA HORÁRIA (planilha do Google Sheets) ================= */
+  // Planilha oficial de controle de carga horária — lida ao vivo, direto do
+  // Google Sheets, então qualquer atualização na planilha reflete aqui sem
+  // precisar mexer no site.
+  const CH_SHEET_ID = '1VGY3ThyTrL6tPH08adQLLgI7Jd_InXUv';
+  const CH_SHEET_GID = '918493808';
+  const CH_CSV_URL = `https://docs.google.com/spreadsheets/d/${CH_SHEET_ID}/export?format=csv&gid=${CH_SHEET_GID}`;
+  const CH_REFRESH_MS = 5 * 60 * 1000; // 5 minutos
+  let chRefreshTimer = null;
+
+  function parseCsv(text){
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for(let i=0; i<text.length; i++){
+      const c = text[i];
+      if(inQuotes){
+        if(c === '"'){
+          if(text[i+1] === '"'){ field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else if(c === '"'){
+        inQuotes = true;
+      } else if(c === ','){
+        row.push(field); field = '';
+      } else if(c === '\r'){
+        // ignora
+      } else if(c === '\n'){
+        row.push(field); rows.push(row); row = []; field = '';
+      } else {
+        field += c;
+      }
+    }
+    if(field.length > 0 || row.length > 0){ row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function parsePtNumber(str){
+    if(!str) return 0;
+    const cleaned = String(str).replace(/\./g,'').replace(',', '.').replace('%','').trim();
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? 0 : n;
+  }
+
+  async function fetchCargaHoraria(){
+    const res = await fetch(CH_CSV_URL, { cache:'no-store' });
+    if(!res.ok) throw new Error('Falha ao buscar planilha de carga horária');
+    const text = await res.text();
+    const rows = parseCsv(text).filter(r => r.some(f => f.trim() !== ''));
+    const dataRows = rows.slice(1);
+
+    let currentArea = '';
+    const disciplinas = [];
+    const resumoLabels = {};
+    let diasDecorridos = null, diasPrevistos = null, evolucao = null;
+
+    dataRows.forEach((r, idx) => {
+      const area = (r[0]||'').trim();
+      if(area) currentArea = area;
+      const nome = (r[1]||'').trim();
+      if(nome){
+        disciplinas.push({
+          area: currentArea,
+          nome,
+          chPrevista: parsePtNumber(r[2]),
+          chExecutada: parsePtNumber(r[3]),
+          percentual: parsePtNumber(r[4])
+        });
+      }
+      const label = (r[6]||'').trim();
+      if(label) resumoLabels[label] = (r[7]||'').trim();
+      if(idx === 0){
+        if((r[9]||'').trim()) diasDecorridos = parsePtNumber(r[9]);
+        if((r[10]||'').trim()) diasPrevistos = parsePtNumber(r[10]);
+        if((r[11]||'').trim()) evolucao = parsePtNumber(r[11]);
+      }
+    });
+
+    return {
+      disciplinas,
+      resumo: {
+        chTotalPrevista: parsePtNumber(resumoLabels['C.H. Total Prevista:']),
+        chTotalExecutada: parsePtNumber(resumoLabels['C.H. Total Executada:']),
+        percentualTotal: parsePtNumber(resumoLabels['Porcentagem Total:']),
+        diasDecorridos, diasPrevistos, evolucao
+      }
+    };
+  }
+
+  function fmtPct(n){
+    return n.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 }) + '%';
+  }
+
+  async function renderCargaHoraria(){
+    const body = $('#ch-table-body');
+    const summary = $('#ch-summary');
+    try{
+      const { disciplinas, resumo } = await fetchCargaHoraria();
+
+      const statsHtml = [
+        `<div class="ch-stat"><div class="ch-stat-value">${resumo.chTotalPrevista}h</div><div class="ch-stat-label">C.H. total prevista</div></div>`,
+        `<div class="ch-stat"><div class="ch-stat-value">${resumo.chTotalExecutada}h</div><div class="ch-stat-label">C.H. total executada</div></div>`,
+        `<div class="ch-stat"><div class="ch-stat-value">${fmtPct(resumo.percentualTotal)}</div><div class="ch-stat-label">Progresso geral</div></div>`
+      ];
+      if(resumo.diasDecorridos != null){
+        statsHtml.push(`<div class="ch-stat"><div class="ch-stat-value">${resumo.diasDecorridos}/${resumo.diasPrevistos}</div><div class="ch-stat-label">Dias letivos (${fmtPct(resumo.evolucao)})</div></div>`);
+      }
+      summary.innerHTML = statsHtml.join('');
+
+      let lastArea = null;
+      body.innerHTML = disciplinas.map(d => {
+        let areaRow = '';
+        if(d.area !== lastArea){
+          areaRow = `<tr class="ch-area-row"><td colspan="4">${escapeHtml(d.area)}</td></tr>`;
+          lastArea = d.area;
+        }
+        const pct = Math.max(0, Math.min(100, d.percentual));
+        return `
+          ${areaRow}
+          <tr>
+            <td>${escapeHtml(d.nome)}</td>
+            <td>${d.chPrevista}h</td>
+            <td>${d.chExecutada}h</td>
+            <td>
+              <div class="ch-progress-cell">
+                <div class="ch-bar-wrap"><div class="ch-bar-fill" style="width:${pct}%"></div></div>
+                <span class="ch-pct-label">${fmtPct(d.percentual)}</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      $('#ch-updated-label').textContent = `Atualizado às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+    }catch(err){
+      console.error('Erro ao carregar planilha de carga horária:', err);
+      body.innerHTML = `<tr><td colspan="4"><div class="empty-state">Não foi possível carregar os dados da planilha agora.</div></td></tr>`;
+      summary.innerHTML = '';
+      $('#ch-updated-label').textContent = '';
+    }
+  }
+
+  function startChAutoRefresh(){
+    stopChAutoRefresh();
+    chRefreshTimer = setInterval(renderCargaHoraria, CH_REFRESH_MS);
+  }
+  function stopChAutoRefresh(){
+    if(chRefreshTimer){ clearInterval(chRefreshTimer); chRefreshTimer = null; }
+  }
+
+  $('#ch-refresh-btn').addEventListener('click', renderCargaHoraria);
 
   /* ================= DISCIPLINES ================= */
   function renderDisciplines(){

@@ -161,6 +161,25 @@
 
     <!-- DISCIPLINAS -->
     <section class="view hidden" id="view-disciplinas">
+      <div class="panel" id="ch-panel">
+        <div class="panel-head schedule-head">
+          <h2>Controle de carga horária</h2>
+          <div class="week-nav">
+            <span class="muted" id="ch-updated-label"></span>
+            <button class="icon-btn" id="ch-refresh-btn" title="Atualizar agora">⟳</button>
+          </div>
+        </div>
+        <div class="ch-summary" id="ch-summary"></div>
+        <div class="task-table-wrap">
+          <table class="ch-table">
+            <thead>
+              <tr><th>Disciplina</th><th>CH prevista</th><th>CH executada</th><th>Progresso</th></tr>
+            </thead>
+            <tbody id="ch-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="panel">
         <div class="panel-head">
           <h2>Disciplinas</h2>
