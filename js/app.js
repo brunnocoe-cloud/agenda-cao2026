@@ -27,7 +27,11 @@
     { nome:'Metodologia de Pesquisa II', professor:'Silvio José de Sousa Filho' },
     { nome:'Planejamento Estratégico e Trabalho de Comando', professor:'Ricardo Belini Muffato de Souza' },
     { nome:'Políticas Públicas e Segurança Pública', professor:'Adriano Sérgio Lopes da Gama Cerqueira' },
-    { nome:'Saúde Integral na gestão de equipes e qualidade de vida na tropa', professor:'Patrícia Calado Pena' }
+    { nome:'Saúde Integral na gestão de equipes e qualidade de vida na tropa', professor:'Patrícia Calado Pena' },
+    { nome:'Tecnologia da Informação', professor:'' },
+    { nome:'Seminário de Boas Práticas em Ciências Policiais', professor:'' },
+    { nome:'Tópicos Contemporâneos: Inteligência, Segurança e Defesa', professor:'' },
+    { nome:'Sociologia do Crime e da Violência', professor:'' }
   ];
 
   const DEFAULT_STATE = {
@@ -827,8 +831,12 @@
     const usadas = state.disciplinas.map(d => d.cor);
     let corIdx = 0;
     faltantes.forEach(c => {
-      while(usadas.includes(DEFAULT_COLORS[corIdx % DEFAULT_COLORS.length])) corIdx++;
+      let tentativas = 0;
+      while(usadas.includes(DEFAULT_COLORS[corIdx % DEFAULT_COLORS.length]) && tentativas < DEFAULT_COLORS.length){
+        corIdx++; tentativas++;
+      }
       const cor = DEFAULT_COLORS[corIdx % DEFAULT_COLORS.length];
+      corIdx++;
       usadas.push(cor);
       state.disciplinas.push({ id: uid(), nome: c.nome, professor: c.professor, cor });
     });
