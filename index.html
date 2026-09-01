@@ -195,12 +195,19 @@
     </div>
     <form id="task-form">
       <input type="hidden" id="task-id">
+      <input type="hidden" id="task-categoria" value="disciplina">
+      <div class="type-toggle" id="task-categoria-toggle">
+        <button type="button" class="type-toggle-btn active" data-categoria="disciplina">Disciplina</button>
+        <button type="button" class="type-toggle-btn" data-categoria="extra">Atividade extra</button>
+      </div>
       <label>Título
         <input type="text" id="task-titulo" required placeholder="Ex.: Artigo científico — Gestão de Crises">
       </label>
-      <label>Disciplina
-        <select id="task-disciplina" required></select>
-      </label>
+      <div id="task-disciplina-fields">
+        <label>Disciplina
+          <select id="task-disciplina"></select>
+        </label>
+      </div>
       <div class="form-row">
         <label>Tipo
           <select id="task-tipo">

@@ -169,6 +169,8 @@
   const WEEKDAY_LABELS = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
   const WEEKDAY_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
+  const EXTRA_COLOR = '#5f7fa6';
+
   function getDisciplina(id){
     return state.disciplinas.find(d => d.id === id);
   }
@@ -181,6 +183,16 @@
   function disciplinaName(id){
     const d = getDisciplina(id);
     return d ? d.nome : '(sem disciplina)';
+  }
+
+  function isTrabalhoExtra(t){
+    return !!t && t.categoria === 'extra';
+  }
+  function trabalhoColor(t){
+    return isTrabalhoExtra(t) ? EXTRA_COLOR : disciplinaColor(t.disciplinaId);
+  }
+  function trabalhoDisciplinaLabel(t){
+    return isTrabalhoExtra(t) ? 'Atividade extra' : disciplinaName(t.disciplinaId);
   }
 
   function urgencyClass(days){
@@ -245,11 +257,11 @@
           <div class="deadline-card ${cls}" data-open-task="${t.id}">
             <div class="deadline-top">
               <div class="deadline-days ${cls}">${daysLabel}${sub ? `<small>${sub}</small>` : ''}</div>
-              <span class="deadline-tag" style="background:${disciplinaColor(t.disciplinaId)}">${TIPO_LABELS[t.tipo]||t.tipo}</span>
+              <span class="deadline-tag" style="background:${trabalhoColor(t)}">${TIPO_LABELS[t.tipo]||t.tipo}</span>
             </div>
             <div class="deadline-title">${escapeHtml(t.titulo)}</div>
             <div class="deadline-meta">
-              <span>${escapeHtml(disciplinaName(t.disciplinaId))}</span>
+              <span>${escapeHtml(trabalhoDisciplinaLabel(t))}</span>
               <span>${formatDatePt(d)}</span>
             </div>
           </div>
@@ -351,7 +363,7 @@
 
       const maxShow = 3;
       const pillsHtml = dayTasks.slice(0, maxShow).map(t => `
-        <div class="cal-task-pill" style="background:${disciplinaColor(t.disciplinaId)}" data-open-task="${t.id}" title="${escapeHtml(t.titulo)}">${escapeHtml(t.titulo)}</div>
+        <div class="cal-task-pill" style="background:${trabalhoColor(t)}" data-open-task="${t.id}" title="${escapeHtml(t.titulo)}">${escapeHtml(t.titulo)}</div>
       `).join('');
       const moreHtml = dayTasks.length > maxShow ? `<div class="cal-more" data-day="${iso}">+${dayTasks.length - maxShow} mais</div>` : '';
 
@@ -381,7 +393,7 @@
   function showDayPopover(evt, iso, tasks){
     const pop = $('#day-popover');
     pop.innerHTML = `<h4>${formatDatePt(parseDate(iso))}</h4>` + tasks.map(t =>
-      `<div class="pop-item" data-open-task="${t.id}" style="cursor:pointer;border-left:3px solid ${disciplinaColor(t.disciplinaId)};padding-left:8px;">${escapeHtml(t.titulo)}</div>`
+      `<div class="pop-item" data-open-task="${t.id}" style="cursor:pointer;border-left:3px solid ${trabalhoColor(t)};padding-left:8px;">${escapeHtml(t.titulo)}</div>`
     ).join('');
     const rect = evt.target.getBoundingClientRect();
     pop.style.top = `${rect.bottom + 6}px`;
@@ -399,7 +411,7 @@
   /* ================= TASK TABLE (TRABALHOS) ================= */
   function refreshDisciplinaFilters(){
     const opts = state.disciplinas.map(d => `<option value="${d.id}">${escapeHtml(d.nome)}</option>`).join('');
-    $('#filter-disciplina').innerHTML = `<option value="">Todas as disciplinas</option>${opts}`;
+    $('#filter-disciplina').innerHTML = `<option value="">Todas as disciplinas</option>${opts}<option value="__extra__">Atividades extras</option>`;
     $('#task-disciplina').innerHTML = opts || '<option value="">Cadastre uma disciplina primeiro</option>';
   }
 
@@ -445,7 +457,8 @@
     const filterStatus = $('#filter-status').value;
 
     let list = state.trabalhos.slice();
-    if(filterDisc) list = list.filter(t => t.disciplinaId === filterDisc);
+    if(filterDisc === '__extra__') list = list.filter(t => isTrabalhoExtra(t));
+    else if(filterDisc) list = list.filter(t => t.disciplinaId === filterDisc && !isTrabalhoExtra(t));
     if(filterStatus) list = list.filter(t => (filterStatus === 'concluido') === !!t.concluido);
     list.sort((a,b) => parseDate(a.data) - parseDate(b.data));
 
@@ -477,7 +490,7 @@
         <tr>
           <td><span class="status-dot ${t.concluido?'concluido':'pendente'}" title="${t.concluido?'Concluído':'Pendente'}"></span></td>
           <td>${escapeHtml(t.titulo)}</td>
-          <td><span class="chip" style="background:${disciplinaColor(t.disciplinaId)}">${escapeHtml(disciplinaName(t.disciplinaId))}</span></td>
+          <td><span class="chip" style="background:${trabalhoColor(t)}">${escapeHtml(trabalhoDisciplinaLabel(t))}</span></td>
           <td>${TIPO_LABELS[t.tipo]||t.tipo}</td>
           <td>${formatDatePt(d)}</td>
           <td>${remainingHtml}</td>
@@ -507,41 +520,64 @@
   const taskModal = $('#task-modal');
   const taskForm = $('#task-form');
 
+  function setTaskCategoria(cat){
+    const categoria = cat === 'extra' ? 'extra' : 'disciplina';
+    $('#task-categoria').value = categoria;
+    $$('.type-toggle-btn', $('#task-categoria-toggle')).forEach(b =>
+      b.classList.toggle('active', b.dataset.categoria === categoria));
+    $('#task-disciplina-fields').classList.toggle('hidden', categoria !== 'disciplina');
+  }
+
+  $$('.type-toggle-btn', $('#task-categoria-toggle')).forEach(btn => {
+    btn.addEventListener('click', () => setTaskCategoria(btn.dataset.categoria));
+  });
+
   function openTaskModal(id){
-    if(state.disciplinas.length === 0){
-      alert('Cadastre ao menos uma disciplina antes de lançar um trabalho.');
-      switchView('disciplinas');
-      return;
+    const isEdit = !!id;
+    const editing = isEdit ? state.trabalhos.find(x => x.id === id) : null;
+    const willBeExtra = editing ? isTrabalhoExtra(editing) : false;
+    if(state.disciplinas.length === 0 && !willBeExtra){
+      if(!confirm('Nenhuma disciplina cadastrada. Deseja lançar este item como atividade extra?')){
+        switchView('disciplinas');
+        return;
+      }
     }
     refreshDisciplinaFilters();
     taskForm.reset();
-    const isEdit = !!id;
     $('#task-modal-title').textContent = isEdit ? 'Editar trabalho' : 'Novo trabalho';
     $('#task-delete-btn').hidden = !isEdit;
 
     if(isEdit){
-      const t = state.trabalhos.find(x => x.id === id);
+      const t = editing;
       $('#task-id').value = t.id;
       $('#task-titulo').value = t.titulo;
-      $('#task-disciplina').value = t.disciplinaId;
+      $('#task-disciplina').value = t.disciplinaId || '';
       $('#task-tipo').value = t.tipo;
       $('#task-data').value = t.data;
       $('#task-obs').value = t.obs || '';
       $('#task-concluido').checked = !!t.concluido;
+      setTaskCategoria(isTrabalhoExtra(t) ? 'extra' : 'disciplina');
     } else {
       $('#task-id').value = '';
       $('#task-data').value = toISO(todayMidnight());
+      setTaskCategoria(state.disciplinas.length === 0 ? 'extra' : 'disciplina');
     }
     taskModal.classList.remove('hidden');
   }
 
   taskForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    const categoria = $('#task-categoria').value === 'extra' ? 'extra' : 'disciplina';
+    if(categoria === 'disciplina' && !$('#task-disciplina').value){
+      alert('Selecione uma disciplina ou marque o trabalho como atividade extra.');
+      return;
+    }
     const id = $('#task-id').value || uid();
     const payload = {
       id,
+      categoria,
       titulo: $('#task-titulo').value.trim(),
-      disciplinaId: $('#task-disciplina').value,
+      disciplinaId: categoria === 'extra' ? '' : $('#task-disciplina').value,
       tipo: $('#task-tipo').value,
       data: $('#task-data').value,
       obs: $('#task-obs').value.trim(),
@@ -860,8 +896,6 @@
     2: 'Almoço · 12h10 – 13h20',
     3: 'Intervalo · 15h00 – 15h20'
   };
-
-  const EXTRA_COLOR = '#5f7fa6';
 
   let schCursor = todayMidnight(); // qualquer data dentro da semana exibida
 
