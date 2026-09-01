@@ -192,6 +192,7 @@ input,select,textarea{font-family:inherit;}
   margin:0;
 }
 .muted{color:var(--text-faint);font-size:12.5px;}
+.field-hint{margin:-2px 0 2px;}
 
 /* ---------- Stats row ---------- */
 .stats-row{

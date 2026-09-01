@@ -526,6 +526,7 @@
     $$('.type-toggle-btn', $('#task-categoria-toggle')).forEach(b =>
       b.classList.toggle('active', b.dataset.categoria === categoria));
     $('#task-disciplina-fields').classList.toggle('hidden', categoria !== 'disciplina');
+    $('#task-extra-hint').classList.toggle('hidden', categoria !== 'extra');
   }
 
   $$('.type-toggle-btn', $('#task-categoria-toggle')).forEach(btn => {
