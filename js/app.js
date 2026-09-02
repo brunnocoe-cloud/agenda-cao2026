@@ -238,38 +238,47 @@
       <div class="stat-card"><div class="stat-value">${concluidos.length}</div><div class="stat-label">Concluídos</div></div>
     `;
 
-    const grid = $('#deadline-grid');
-    const upcoming = pendentes
-      .slice()
-      .sort((a,b) => parseDate(a.data) - parseDate(b.data))
-      .slice(0, 9);
-
-    if(upcoming.length === 0){
-      grid.innerHTML = `<div class="empty-state">Nenhum trabalho pendente. Clique em "Novo trabalho" para lançar um prazo.</div>`;
-    } else {
-      grid.innerHTML = upcoming.map(t => {
-        const d = parseDate(t.data);
-        const days = daysBetween(d, today);
-        const cls = urgencyClass(days);
-        const daysLabel = days === 0 ? 'HOJE' : days === 1 ? 'AMANHÃ' : days < 0 ? `${Math.abs(days)}d atraso` : `${days}`;
-        const sub = days < 0 || days === 0 || days === 1 ? '' : 'dias';
-        return `
-          <div class="deadline-card ${cls}" data-open-task="${t.id}">
-            <div class="deadline-top">
-              <div class="deadline-days ${cls}">${daysLabel}${sub ? `<small>${sub}</small>` : ''}</div>
-              <span class="deadline-tag" style="background:${trabalhoColor(t)}">${TIPO_LABELS[t.tipo]||t.tipo}</span>
-            </div>
-            <div class="deadline-title">${escapeHtml(t.titulo)}</div>
-            <div class="deadline-meta">
-              <span>${escapeHtml(trabalhoDisciplinaLabel(t))}</span>
-              <span>${formatDatePt(d)}</span>
-            </div>
+    const deadlineCard = (t) => {
+      const d = parseDate(t.data);
+      const days = daysBetween(d, today);
+      const cls = urgencyClass(days);
+      const daysLabel = days === 0 ? 'HOJE' : days === 1 ? 'AMANHÃ' : days < 0 ? `${Math.abs(days)}d atraso` : `${days}`;
+      const sub = days < 0 || days === 0 || days === 1 ? '' : 'dias';
+      return `
+        <div class="deadline-card ${cls}" data-open-task="${t.id}">
+          <div class="deadline-top">
+            <div class="deadline-days ${cls}">${daysLabel}${sub ? `<small>${sub}</small>` : ''}</div>
+            <span class="deadline-tag" style="background:${trabalhoColor(t)}">${TIPO_LABELS[t.tipo]||t.tipo}</span>
           </div>
-        `;
-      }).join('');
+          <div class="deadline-title">${escapeHtml(t.titulo)}</div>
+          <div class="deadline-meta">
+            <span>${escapeHtml(trabalhoDisciplinaLabel(t))}</span>
+            <span>${formatDatePt(d)}</span>
+          </div>
+        </div>
+      `;
+    };
+
+    const byDate = (a,b) => parseDate(a.data) - parseDate(b.data);
+    const upcomingTrabalhos = pendentes.filter(t => !isTrabalhoExtra(t)).slice().sort(byDate).slice(0, 9);
+    const upcomingExtras = pendentes.filter(isTrabalhoExtra).slice().sort(byDate).slice(0, 9);
+
+    const grid = $('#deadline-grid');
+    grid.innerHTML = upcomingTrabalhos.length === 0
+      ? `<div class="empty-state">Nenhum trabalho pendente. Clique em "Novo trabalho" para lançar um prazo.</div>`
+      : upcomingTrabalhos.map(deadlineCard).join('');
+
+    const extraPanel = $('#deadline-extra-panel');
+    const hasExtras = state.trabalhos.some(isTrabalhoExtra);
+    extraPanel.classList.toggle('hidden', !hasExtras);
+    const gridExtra = $('#deadline-grid-extra');
+    if(hasExtras){
+      gridExtra.innerHTML = upcomingExtras.length === 0
+        ? `<div class="empty-state">Nenhuma atividade extra pendente.</div>`
+        : upcomingExtras.map(deadlineCard).join('');
     }
 
-    $$('[data-open-task]', grid).forEach(el => {
+    $$('[data-open-task]', $('#view-dashboard')).forEach(el => {
       el.addEventListener('click', () => openTaskModal(el.dataset.openTask));
     });
 
