@@ -572,6 +572,17 @@
   const taskModal = $('#task-modal');
   const taskForm = $('#task-form');
 
+  // Abre o calendário nativo do navegador ao clicar/focar no campo de data,
+  // em vez de exigir que o usuário acerte o pequeno ícone de calendário.
+  const taskDataInput = $('#task-data');
+  ['click','focus'].forEach(evt => {
+    taskDataInput.addEventListener(evt, () => {
+      if(typeof taskDataInput.showPicker === 'function'){
+        try{ taskDataInput.showPicker(); }catch(e){}
+      }
+    });
+  });
+
   function setTaskCategoria(cat){
     const categoria = cat === 'extra' ? 'extra' : 'disciplina';
     $('#task-categoria').value = categoria;
