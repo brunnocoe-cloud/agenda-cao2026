@@ -158,7 +158,11 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       refreshDisciplinaFilters();
       renderDashboard(); renderTaskTable(); renderCalendar(); renderSchedule(); renderDisciplines(); renderDriveWidget();
-      maybeShowNextDeadlineAlert();
+      // só avalia o pop-up de prazo quando o dado já veio confirmado do
+      // servidor — um snapshot vindo só do cache local (comum logo após
+      // abrir a página) pode estar incompleto/desatualizado e faria o aviso
+      // ser descartado silenciosamente para sempre nesse acesso
+      if(!doc.metadata.fromCache) maybeShowNextDeadlineAlert();
     }, err => console.error('Erro ao ouvir atualizações da nuvem:', err));
   } else {
     if(state.disciplinas.length === 0){
