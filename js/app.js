@@ -138,7 +138,11 @@
   }
 
   if(FS_ENABLED){
-    turmaRef.onSnapshot(doc => {
+    // includeMetadataChanges: sem isso, se o cache local já bater com o
+    // servidor (comum para quem já usou o site antes), o Firestore dispara
+    // o callback só UMA vez com fromCache=true e nunca mais — o que fazia o
+    // pop-up de prazo nunca ser reavaliado numa página só recarregada.
+    turmaRef.onSnapshot({ includeMetadataChanges: true }, doc => {
       if(!doc.exists){
         // primeiro acesso desta turma: semeia o catálogo oficial na nuvem
         turmaRef.set({
