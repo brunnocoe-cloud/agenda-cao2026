@@ -158,6 +158,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       refreshDisciplinaFilters();
       renderDashboard(); renderTaskTable(); renderCalendar(); renderSchedule(); renderDisciplines(); renderDriveWidget();
+      maybeShowNextDeadlineAlert();
     }, err => console.error('Erro ao ouvir atualizações da nuvem:', err));
   } else {
     if(state.disciplinas.length === 0){
@@ -347,6 +348,29 @@
       `;
       }).join('');
     }
+  }
+
+  // Pop-up de "próximo prazo" — aparece uma única vez por acesso à página,
+  // com o trabalho pendente mais próximo (hoje ou no futuro).
+  let deadlineAlertShown = false;
+  function maybeShowNextDeadlineAlert(){
+    if(deadlineAlertShown) return;
+    deadlineAlertShown = true;
+    const today = todayMidnight();
+    const proximo = state.trabalhos
+      .filter(t => !t.concluido)
+      .map(t => ({ t, days: daysBetween(parseDate(t.data), today) }))
+      .filter(x => x.days >= 0)
+      .sort((a,b) => a.days - b.days)[0];
+    if(!proximo) return;
+    const { t, days } = proximo;
+    const diasLabel = days === 0 ? 'ATENÇÃO! A entrega do próximo trabalho é hoje:'
+      : days === 1 ? 'ATENÇÃO! Falta 1 dia para a entrega do próximo trabalho:'
+      : `ATENÇÃO! Faltam ${days} dias para a entrega do próximo trabalho:`;
+    $('#alert-days-text').textContent = diasLabel;
+    $('#alert-task-text').textContent = t.titulo;
+    $('#alert-disc-text').textContent = 'Disciplina: ' + trabalhoDisciplinaLabel(t);
+    $('#alert-modal').classList.remove('hidden');
   }
 
   function escapeHtml(str){
@@ -1217,4 +1241,5 @@
   renderDashboard();
   renderDriveWidget();
   switchView('dashboard');
+  if(!FS_ENABLED) maybeShowNextDeadlineAlert();
 })();

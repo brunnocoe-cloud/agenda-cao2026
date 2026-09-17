@@ -338,6 +338,25 @@
   </div>
 </div>
 
+<!-- MODAL: Alerta do próximo prazo -->
+<div class="modal-overlay hidden" id="alert-modal">
+  <div class="modal modal-alert">
+    <div class="modal-head">
+      <h3>⚠️ Atenção!</h3>
+      <button class="icon-btn" data-close="alert-modal">×</button>
+    </div>
+    <div class="alert-body">
+      <p class="alert-days" id="alert-days-text"></p>
+      <p class="alert-task" id="alert-task-text"></p>
+      <p class="alert-disc" id="alert-disc-text"></p>
+    </div>
+    <div class="modal-actions">
+      <div class="spacer"></div>
+      <button type="button" class="btn btn-primary" data-close="alert-modal">Entendi</button>
+    </div>
+  </div>
+</div>
+
 <div class="day-popover hidden" id="day-popover"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>

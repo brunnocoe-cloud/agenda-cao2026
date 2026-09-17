@@ -540,6 +540,13 @@ label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--te
 }
 .swatch.selected{border-color:#fff;box-shadow:0 0 0 2px var(--gold);}
 
+.modal-alert .modal-head{border-bottom-color:var(--warn);}
+.modal-alert .modal-head h3{color:var(--warn);}
+.alert-body{padding:20px;display:flex;flex-direction:column;gap:8px;}
+.alert-days{margin:0;font-size:15px;font-weight:700;color:var(--warn);}
+.alert-task{margin:0;font-size:16px;font-weight:700;color:var(--text);}
+.alert-disc{margin:0;font-size:13px;color:var(--text-dim);}
+
 .type-toggle{display:flex;gap:6px;background:var(--bg-elev);border:1px solid var(--border);border-radius:9px;padding:4px;}
 .type-toggle-btn{
   flex:1;
