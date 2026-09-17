@@ -354,19 +354,26 @@
     }
   }
 
-  // Pop-up de "próximo prazo" — aparece uma única vez por acesso à página,
-  // com o trabalho pendente mais próximo (hoje ou no futuro).
-  let deadlineAlertShown = false;
-  function maybeShowNextDeadlineAlert(){
-    if(deadlineAlertShown) return;
-    deadlineAlertShown = true;
+  // Pop-up de "próximo prazo": mostra o trabalho pendente mais próximo (hoje
+  // ou no futuro). `showEmptyMsg` controla o que acontece quando não há
+  // nenhum — no carregamento da página fica em silêncio (não interrompe à
+  // toa), mas quando é consequência de uma ação do usuário (concluir/excluir
+  // um trabalho) mostra uma mensagem de confirmação mesmo sem próximo prazo.
+  function renderNextDeadlineAlert(showEmptyMsg){
     const today = todayMidnight();
     const proximo = state.trabalhos
       .filter(t => !t.concluido)
       .map(t => ({ t, days: daysBetween(parseDate(t.data), today) }))
       .filter(x => x.days >= 0)
       .sort((a,b) => a.days - b.days)[0];
-    if(!proximo) return;
+    if(!proximo){
+      if(!showEmptyMsg) return;
+      $('#alert-days-text').textContent = 'Nenhum outro trabalho pendente com prazo no momento.';
+      $('#alert-task-text').textContent = '';
+      $('#alert-disc-text').textContent = '';
+      $('#alert-modal').classList.remove('hidden');
+      return;
+    }
     const { t, days } = proximo;
     const diasLabel = days === 0 ? 'ATENÇÃO! A entrega do próximo trabalho é hoje:'
       : days === 1 ? 'ATENÇÃO! Falta 1 dia para a entrega do próximo trabalho:'
@@ -375,6 +382,13 @@
     $('#alert-task-text').textContent = t.titulo;
     $('#alert-disc-text').textContent = 'Disciplina: ' + trabalhoDisciplinaLabel(t);
     $('#alert-modal').classList.remove('hidden');
+  }
+
+  let deadlineAlertShown = false;
+  function maybeShowNextDeadlineAlert(){
+    if(deadlineAlertShown) return;
+    deadlineAlertShown = true;
+    renderNextDeadlineAlert(false);
   }
 
   function escapeHtml(str){
@@ -589,6 +603,7 @@
       if(confirm('Excluir este trabalho?')){
         state.trabalhos = state.trabalhos.filter(t => t.id !== b.dataset.delTask);
         saveState(['trabalhos']); renderTaskTable(); renderDashboard();
+        renderNextDeadlineAlert(true);
       }
     }));
   }
@@ -680,6 +695,7 @@
     saveState(['trabalhos']);
     closeModal('task-modal');
     renderDashboard(); renderTaskTable(); renderCalendar();
+    renderNextDeadlineAlert(true);
   });
 
   $('#task-delete-btn').addEventListener('click', () => {
@@ -689,6 +705,7 @@
       saveState(['trabalhos']);
       closeModal('task-modal');
       renderDashboard(); renderTaskTable(); renderCalendar();
+      renderNextDeadlineAlert(true);
     }
   });
 
