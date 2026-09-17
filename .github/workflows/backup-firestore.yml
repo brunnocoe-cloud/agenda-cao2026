@@ -15,20 +15,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.FIRESTORE_BACKUP_SERVICE_ACCOUNT }}'
-          token_format: 'access_token'
-
       - name: Baixar e converter dados da turma
+        env:
+          SA_KEY: ${{ secrets.FIRESTORE_BACKUP_SERVICE_ACCOUNT }}
         run: |
           set -e
+          SA_FILE=$(mktemp)
+          printf '%s' "$SA_KEY" > "$SA_FILE"
+
+          TOKEN=$(bash scripts/gcp_jwt_token.sh "$SA_FILE")
+          rm -f "$SA_FILE"
+
           RAW=$(mktemp)
           curl -sf \
-            -H "Authorization: Bearer ${{ steps.auth.outputs.access_token }}" \
+            -H "Authorization: Bearer $TOKEN" \
             "https://firestore.googleapis.com/v1/projects/agenda-cao2026/databases/(default)/documents/turmas/cao2-2026" \
             -o "$RAW"
+
           mkdir -p backups
           python3 scripts/convert_firestore_backup.py "$RAW" "backups/agenda-cao2226-backup-$(date -u +%F).json"
 
