@@ -70,26 +70,46 @@
 
   // Compartilhamento em nuvem (Firebase Firestore) — opcional. Sem config, o site
   // funciona normalmente, mas cada navegador guarda seus próprios dados.
+  //
+  // saveState() nunca sobrescreve o documento inteiro: cada chamada informa
+  // quais coleções (chaves de nível superior) mudaram e só essas são gravadas
+  // (merge). Além disso, uma transação confere um contador de revisão (_rev)
+  // antes de gravar — se outra aba já salvou algo mais novo, a gravação é
+  // recusada em vez de apagar silenciosamente o que essa outra aba salvou.
+  // Isso evita que uma aba esquecida aberta com dados desatualizados apague
+  // trabalhos/horários salvos por outra pessoa nesse meio-tempo.
   const TURMA_ID = 'cao2-2026';
   const FS_ENABLED = !!(window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey && typeof firebase !== 'undefined');
   let turmaRef = null;
+  let fsDb = null;
+  let lastKnownRev = 0;
   if(FS_ENABLED){
     firebase.initializeApp(window.FIREBASE_CONFIG);
-    const db = firebase.firestore();
-    try{ db.enablePersistence({ synchronizeTabs:true }).catch(()=>{}); }catch(e){}
-    turmaRef = db.collection('turmas').doc(TURMA_ID);
+    fsDb = firebase.firestore();
+    try{ fsDb.enablePersistence({ synchronizeTabs:true }).catch(()=>{}); }catch(e){}
+    turmaRef = fsDb.collection('turmas').doc(TURMA_ID);
   }
 
-  function saveState(){
+  function saveState(changedKeys){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    if(FS_ENABLED){
-      turmaRef.set({
-        disciplinas: state.disciplinas,
-        trabalhos: state.trabalhos,
-        horarios: state.horarios,
-        config: state.config
-      }).catch(err => console.error('Erro ao sincronizar com a nuvem:', err));
-    }
+    if(!FS_ENABLED) return;
+    const keys = (changedKeys && changedKeys.length) ? changedKeys : ['disciplinas','trabalhos','horarios','config'];
+    fsDb.runTransaction(async (tx) => {
+      const snap = await tx.get(turmaRef);
+      const serverRev = snap.exists ? (snap.data()._rev || 0) : 0;
+      if(snap.exists && serverRev !== lastKnownRev){
+        throw new Error('STALE_REV');
+      }
+      const patch = { _rev: serverRev + 1 };
+      keys.forEach(k => { patch[k] = state[k]; });
+      tx.set(turmaRef, patch, { merge:true });
+    }).catch(err => {
+      if(err && err.message === 'STALE_REV'){
+        alert('Estes dados foram atualizados por outra pessoa enquanto esta página estava aberta. Recarregue a página (F5) e refaça a alteração para não sobrescrever o que a outra pessoa salvou.');
+      } else {
+        console.error('Erro ao sincronizar com a nuvem:', err);
+      }
+    });
   }
 
   let state = loadState();
@@ -106,11 +126,15 @@
           disciplinas: buildCatalogDisciplinas(),
           trabalhos: [],
           horarios: [],
-          config: { driveGeral: DEFAULT_DRIVE_GERAL }
+          config: { driveGeral: DEFAULT_DRIVE_GERAL },
+          _rev: 1
         }).catch(err => console.error('Erro ao inicializar dados na nuvem:', err));
         return;
       }
-      state = Object.assign(structuredClone(DEFAULT_STATE), doc.data());
+      const data = doc.data();
+      lastKnownRev = data._rev || 0;
+      delete data._rev;
+      state = Object.assign(structuredClone(DEFAULT_STATE), data);
       if(!state.config) state.config = { driveGeral:'' };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       refreshDisciplinaFilters();
@@ -517,7 +541,7 @@
     $$('[data-del-task]', body).forEach(b => b.addEventListener('click', () => {
       if(confirm('Excluir este trabalho?')){
         state.trabalhos = state.trabalhos.filter(t => t.id !== b.dataset.delTask);
-        saveState(); renderTaskTable(); renderDashboard();
+        saveState(['trabalhos']); renderTaskTable(); renderDashboard();
       }
     }));
   }
@@ -595,7 +619,7 @@
     };
     const idx = state.trabalhos.findIndex(t => t.id === id);
     if(idx >= 0) state.trabalhos[idx] = payload; else state.trabalhos.push(payload);
-    saveState();
+    saveState(['trabalhos']);
     closeModal('task-modal');
     renderDashboard(); renderTaskTable(); renderCalendar();
   });
@@ -604,7 +628,7 @@
     const id = $('#task-id').value;
     if(id && confirm('Excluir este trabalho?')){
       state.trabalhos = state.trabalhos.filter(t => t.id !== id);
-      saveState();
+      saveState(['trabalhos']);
       closeModal('task-modal');
       renderDashboard(); renderTaskTable(); renderCalendar();
     }
@@ -841,7 +865,7 @@
     };
     const idx = state.disciplinas.findIndex(d => d.id === id);
     if(idx >= 0) state.disciplinas[idx] = payload; else state.disciplinas.push(payload);
-    saveState();
+    saveState(['disciplinas']);
     closeModal('disciplina-modal');
     refreshDisciplinaFilters();
     renderDisciplines(); renderDashboard(); renderTaskTable(); renderCalendar(); renderSchedule();
@@ -858,7 +882,7 @@
       state.disciplinas = state.disciplinas.filter(d => d.id !== id);
       state.trabalhos = state.trabalhos.filter(t => t.disciplinaId !== id);
       state.horarios = state.horarios.filter(h => h.disciplinaId !== id);
-      saveState();
+      saveState(['disciplinas','trabalhos','horarios']);
       closeModal('disciplina-modal');
       refreshDisciplinaFilters();
       renderDisciplines(); renderDashboard(); renderTaskTable(); renderCalendar(); renderSchedule();
@@ -886,7 +910,7 @@
       usadas.push(cor);
       state.disciplinas.push({ id: uid(), nome: c.nome, professor: c.professor, cor });
     });
-    saveState();
+    saveState(['disciplinas']);
     refreshDisciplinaFilters();
     renderDisciplines();
     alert(`${faltantes.length} disciplina(s) importada(s) da lista oficial.`);
@@ -1043,7 +1067,7 @@
       : { id, semana, tipo, disciplinaId: $('#horario-disciplina').value, dia, slot, local: $('#horario-local').value.trim() };
     const idx = state.horarios.findIndex(h => h.id === id);
     if(idx >= 0) state.horarios[idx] = payload; else state.horarios.push(payload);
-    saveState();
+    saveState(['horarios']);
     closeModal('horario-modal');
     renderSchedule(); renderDashboard();
   });
@@ -1052,7 +1076,7 @@
     const id = $('#horario-id').value;
     if(id && confirm('Excluir este horário?')){
       state.horarios = state.horarios.filter(h => h.id !== id);
-      saveState();
+      saveState(['horarios']);
       closeModal('horario-modal');
       renderSchedule(); renderDashboard();
     }
@@ -1109,7 +1133,7 @@
         if(confirm('Importar substituirá todos os dados atuais. Continuar?')){
           state = Object.assign(structuredClone(DEFAULT_STATE), data);
           if(!state.config) state.config = { driveGeral:'' };
-          saveState();
+          saveState(['disciplinas','trabalhos','horarios','config']);
           refreshDisciplinaFilters();
           renderDashboard(); renderTaskTable(); renderCalendar(); renderSchedule(); renderDisciplines(); renderDriveWidget();
         }
@@ -1146,7 +1170,7 @@
       return;
     }
     state.config.driveGeral = trimmed;
-    saveState();
+    saveState(['config']);
     renderDriveWidget();
   }
 
