@@ -90,26 +90,45 @@
     turmaRef = fsDb.collection('turmas').doc(TURMA_ID);
   }
 
+  // Fila de gravações: transações rodam uma de cada vez (nunca em paralelo) e
+  // os valores a gravar são capturados no instante da chamada — assim, se o
+  // eco do onSnapshot trocar o objeto `state` entre uma chamada e a próxima
+  // (comum ao salvar vários itens em sequência rápida, ex.: excluir vários
+  // trabalhos seguidos), cada gravação já enfileirada mantém os valores
+  // corretos e não é perdida nem recusada por engano.
+  let saveQueue = Promise.resolve();
+
   function saveState(changedKeys){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    if(!FS_ENABLED) return;
+    if(!FS_ENABLED) return saveQueue;
     const keys = (changedKeys && changedKeys.length) ? changedKeys : ['disciplinas','trabalhos','horarios','config'];
-    fsDb.runTransaction(async (tx) => {
-      const snap = await tx.get(turmaRef);
-      const serverRev = snap.exists ? (snap.data()._rev || 0) : 0;
-      if(snap.exists && serverRev !== lastKnownRev){
-        throw new Error('STALE_REV');
-      }
-      const patch = { _rev: serverRev + 1 };
-      keys.forEach(k => { patch[k] = state[k]; });
-      tx.set(turmaRef, patch, { merge:true });
-    }).catch(err => {
-      if(err && err.message === 'STALE_REV'){
-        alert('Estes dados foram atualizados por outra pessoa enquanto esta página estava aberta. Recarregue a página (F5) e refaça a alteração para não sobrescrever o que a outra pessoa salvou.');
-      } else {
-        console.error('Erro ao sincronizar com a nuvem:', err);
-      }
-    });
+    const values = {};
+    keys.forEach(k => { values[k] = state[k]; });
+    saveQueue = saveQueue
+      .then(() => fsDb.runTransaction(async (tx) => {
+        const snap = await tx.get(turmaRef);
+        const serverRev = snap.exists ? (snap.data()._rev || 0) : 0;
+        if(snap.exists && serverRev !== lastKnownRev){
+          throw new Error('STALE_REV');
+        }
+        const newRev = serverRev + 1;
+        tx.set(turmaRef, Object.assign({ _rev: newRev }, values), { merge:true });
+        return newRev;
+      }))
+      .then(newRev => {
+        // atualiza a revisão conhecida imediatamente, sem esperar o eco do
+        // onSnapshot — evita que a próxima gravação na fila seja recusada por
+        // engano por achar a própria gravação anterior desatualizada
+        lastKnownRev = newRev;
+      })
+      .catch(err => {
+        if(err && err.message === 'STALE_REV'){
+          alert('Estes dados foram atualizados por outra pessoa enquanto esta página estava aberta. Recarregue a página (F5) e refaça a alteração para não sobrescrever o que a outra pessoa salvou.');
+        } else {
+          console.error('Erro ao sincronizar com a nuvem:', err);
+        }
+      });
+    return saveQueue;
   }
 
   let state = loadState();
