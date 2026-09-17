@@ -1,0 +1,45 @@
+name: Backup diário do Firestore
+
+on:
+  schedule:
+    # 06:00 UTC = 03:00 no horário de Brasília (sem horário de verão)
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.FIRESTORE_BACKUP_SERVICE_ACCOUNT }}'
+          token_format: 'access_token'
+
+      - name: Baixar e converter dados da turma
+        run: |
+          set -e
+          RAW=$(mktemp)
+          curl -sf \
+            -H "Authorization: Bearer ${{ steps.auth.outputs.access_token }}" \
+            "https://firestore.googleapis.com/v1/projects/agenda-cao2026/databases/(default)/documents/turmas/cao2-2026" \
+            -o "$RAW"
+          mkdir -p backups
+          python3 scripts/convert_firestore_backup.py "$RAW" "backups/agenda-cao2226-backup-$(date -u +%F).json"
+
+      - name: Commitar backup
+        run: |
+          git config user.name "Backup automático"
+          git config user.email "actions@github.com"
+          git add backups/
+          if git diff --cached --quiet; then
+            echo "Sem mudanças desde o último backup."
+          else
+            git commit -m "Backup automático de $(date -u +%F)"
+            git push
+          fi
