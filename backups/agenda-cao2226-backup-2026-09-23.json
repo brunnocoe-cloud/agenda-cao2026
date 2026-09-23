@@ -1,0 +1,541 @@
+{
+  "config": {
+    "driveGeral": "https://drive.google.com/drive/folders/1QyV8h_ewckUJNvNAPOC2uuXc_xJ7lX8w?usp=sharing"
+  },
+  "disciplinas": [
+    {
+      "nome": "Estatística",
+      "professor": "Frederico Martins de Paula Neto",
+      "id": "mu5mswvvtxldg8",
+      "cor": "#c9a13d"
+    },
+    {
+      "cor": "#8fa9c9",
+      "professor": "Raphael Alexandrino Damásio",
+      "id": "mu5mswvvkome6m",
+      "nome": "Comunicação Organizacional"
+    },
+    {
+      "nome": "Gerenciamento Integrado de Crises",
+      "professor": "Tomás Hilário Cardoso Ferreira",
+      "id": "mu5mswvv9a1y6z",
+      "cor": "#a97fbf"
+    },
+    {
+      "professor": "Filipe Cardoso Borges",
+      "nome": "Gestão de Operações Policiais",
+      "id": "mu5mswvvfnwkft",
+      "cor": "#5a8f6b"
+    },
+    {
+      "professor": "Marcelo Ribeiro Vilas Boas",
+      "id": "mu5mswvvodd5me",
+      "cor": "#c0503f",
+      "nome": "Gestão de Pessoas"
+    },
+    {
+      "nome": "Gestão de Projetos",
+      "id": "mu5mswvvb6psya",
+      "cor": "#c98c3d",
+      "professor": "Luiz Eduardo Mateus Machado"
+    },
+    {
+      "cor": "#6fb0a8",
+      "id": "mu5mswvvd2pznb",
+      "professor": "Filipe Castro Gaigher",
+      "nome": "Gestão do Conhecimento"
+    },
+    {
+      "professor": "Paulo Henrique João Silva",
+      "id": "mu5mswvvcks7le",
+      "cor": "#b0779a",
+      "nome": "Gestão Logística"
+    },
+    {
+      "id": "mu5mswvvvrirs4",
+      "cor": "#7d8ec9",
+      "professor": "Thiago Matias Brey Gil",
+      "nome": "Gestão Orçamentária e Financeira"
+    },
+    {
+      "professor": "João Paulo Fiúza da Silva",
+      "cor": "#a3a3a3",
+      "id": "mu5mswvvbkg8px",
+      "nome": "Gestão por Processos"
+    },
+    {
+      "nome": "Gestão Pública Contemporânea",
+      "professor": "Tiago Farias Braga",
+      "id": "mu5mswvvzwpejc",
+      "cor": "#d98a58"
+    },
+    {
+      "professor": "Danny Zahreddine",
+      "nome": "Introdução à Geopolítica aplicada",
+      "id": "mu5mswvvrnamhx",
+      "cor": "#6f9954"
+    },
+    {
+      "nome": "Metodologia de Pesquisa I",
+      "professor": "Francis Albert Cotta Formiga",
+      "id": "mu5mswvvip7j82",
+      "cor": "#9e5b8f"
+    },
+    {
+      "id": "mu5mswvvhmosp8",
+      "nome": "Metodologia de Pesquisa II",
+      "professor": "Silvio José de Sousa Filho",
+      "cor": "#5f7fa6"
+    },
+    {
+      "cor": "#c2a878",
+      "id": "mu5mswvv3cr0ce",
+      "professor": "Ricardo Belini Muffato de Souza",
+      "nome": "Planejamento Estratégico e Trabalho de Comando"
+    },
+    {
+      "id": "mu5mswvve2w0ss",
+      "cor": "#4f9a94",
+      "professor": "Adriano Sérgio Lopes da Gama Cerqueira",
+      "nome": "Políticas Públicas e Segurança Pública"
+    },
+    {
+      "professor": "Patrícia Calado Pena",
+      "cor": "#a45c5c",
+      "nome": "Saúde Integral na gestão de equipes e qualidade de vida na tropa",
+      "id": "mu5mswvv2plqws"
+    },
+    {
+      "id": "mu5mswvv875cqm",
+      "nome": "Tecnologia da Informação",
+      "cor": "#8a8fbf",
+      "professor": ""
+    },
+    {
+      "professor": "",
+      "id": "mu5mswvvie4t02",
+      "cor": "#c9a13d",
+      "nome": "Seminário de Boas Práticas em Ciências Policiais"
+    },
+    {
+      "nome": "Tópicos Contemporâneos: Inteligência, Segurança e Defesa",
+      "professor": "",
+      "id": "mu5mswvvqdrn98",
+      "cor": "#8fa9c9"
+    },
+    {
+      "nome": "Sociologia do Crime e da Violência",
+      "id": "mu5mswvvfrzi34",
+      "professor": "",
+      "cor": "#a97fbf"
+    }
+  ],
+  "trabalhos": [
+    {
+      "concluido": false,
+      "id": "mu5r5nh7t014x0",
+      "data": "2026-09-24",
+      "titulo": "Seminário de apresentação do TCC - CAO I",
+      "obs": "",
+      "tipo": "seminario",
+      "disciplinaId": "",
+      "categoria": "extra"
+    },
+    {
+      "id": "mu5r74rg3pu6d3",
+      "data": "2026-09-03",
+      "obs": "",
+      "categoria": "disciplina",
+      "titulo": "Debate cruzado- leitura do texto fornecido",
+      "tipo": "trabalho",
+      "concluido": true,
+      "disciplinaId": "mu5mswvvzwpejc"
+    },
+    {
+      "disciplinaId": "mu5mswvvfrzi34",
+      "categoria": "disciplina",
+      "tipo": "trabalho",
+      "obs": "",
+      "titulo": "Resenha manuscrita",
+      "concluido": true,
+      "data": "2026-09-14",
+      "id": "mu5r7xlxmiozy0"
+    },
+    {
+      "data": "2026-10-01",
+      "concluido": false,
+      "obs": "",
+      "categoria": "disciplina",
+      "titulo": "Trabalho digitalizado e apresentação",
+      "tipo": "trabalho",
+      "disciplinaId": "mu5mswvvfnwkft",
+      "id": "mu5r7ypigy7oqu"
+    },
+    {
+      "tipo": "trabalho",
+      "id": "mu5ry0og43o12s",
+      "obs": "",
+      "concluido": false,
+      "categoria": "disciplina",
+      "titulo": "2ª Resenha manuscrita",
+      "data": "2026-09-25",
+      "disciplinaId": "mu5mswvvfrzi34"
+    },
+    {
+      "concluido": false,
+      "id": "mu5rzl82ji7gjg",
+      "tipo": "trabalho",
+      "disciplinaId": "mu5mswvve2w0ss",
+      "data": "2026-10-02",
+      "titulo": "Trabalho escrito e apresentação",
+      "obs": "",
+      "categoria": "disciplina"
+    },
+    {
+      "id": "mu5s26w3x5tziv",
+      "data": "2026-09-22",
+      "categoria": "disciplina",
+      "disciplinaId": "mu5mswvvzwpejc",
+      "concluido": false,
+      "tipo": "trabalho",
+      "obs": "",
+      "titulo": "Trabalho 02"
+    },
+    {
+      "tipo": "trabalho",
+      "id": "mu5s9aepnbm9gn",
+      "disciplinaId": "mu5mswvv9a1y6z",
+      "obs": "",
+      "titulo": "Apresentação do trabalho",
+      "concluido": true,
+      "categoria": "disciplina",
+      "data": "2026-09-17"
+    }
+  ],
+  "horarios": [
+    {
+      "disciplinaId": "mu5mswvvip7j82",
+      "slot": "1",
+      "local": "",
+      "semana": "2026-09-21",
+      "tipo": "disciplina",
+      "id": "mu5rwrrlotev2o",
+      "dia": "1"
+    },
+    {
+      "disciplinaId": "mu5mswvvip7j82",
+      "dia": "1",
+      "tipo": "disciplina",
+      "id": "mu5rwsouy2gqqm",
+      "local": "",
+      "slot": "2",
+      "semana": "2026-09-21"
+    },
+    {
+      "dia": "1",
+      "slot": "3",
+      "id": "mu5rwtndiweh69",
+      "semana": "2026-09-21",
+      "disciplinaId": "mu5mswvvqdrn98",
+      "local": "",
+      "tipo": "disciplina"
+    },
+    {
+      "semana": "2026-09-21",
+      "local": "",
+      "dia": "1",
+      "disciplinaId": "mu5mswvvqdrn98",
+      "id": "mu5rwul7fcfnl8",
+      "tipo": "disciplina",
+      "slot": "4"
+    },
+    {
+      "semana": "2026-09-21",
+      "disciplinaId": "mu5mswvvbkg8px",
+      "slot": "1",
+      "local": "",
+      "id": "mu5rwvivi6u4no",
+      "tipo": "disciplina",
+      "dia": "2"
+    },
+    {
+      "dia": "2",
+      "id": "mu5rwwgh5v2pca",
+      "tipo": "disciplina",
+      "semana": "2026-09-21",
+      "disciplinaId": "mu5mswvvbkg8px",
+      "slot": "2",
+      "local": ""
+    },
+    {
+      "tipo": "disciplina",
+      "local": "",
+      "id": "mu5rwxehiatkke",
+      "disciplinaId": "mu5mswvvzwpejc",
+      "semana": "2026-09-21",
+      "dia": "2",
+      "slot": "3"
+    },
+    {
+      "dia": "2",
+      "id": "mu5rwycg36vpr3",
+      "tipo": "disciplina",
+      "disciplinaId": "mu5mswvvzwpejc",
+      "slot": "4",
+      "local": "",
+      "semana": "2026-09-21"
+    },
+    {
+      "semana": "2026-09-21",
+      "tipo": "disciplina",
+      "local": "09h30–11h10 (horário alterado por causa da visita ao Sicoob às 8h)",
+      "id": "mu5rxczs2l4j6v",
+      "dia": "3",
+      "disciplinaId": "mu5mswvvvrirs4",
+      "slot": "1"
+    },
+    {
+      "local": "11h20–13h00 (horário alterado)",
+      "id": "mu5rxehbs1zyob",
+      "dia": "3",
+      "semana": "2026-09-21",
+      "tipo": "disciplina",
+      "disciplinaId": "mu5mswvvvrirs4",
+      "slot": "2"
+    },
+    {
+      "dia": "4",
+      "semana": "2026-09-21",
+      "titulo": "Seminário de apresentação dos projetos de intervenção - CAO I 2026",
+      "tipo": "extra",
+      "local": "",
+      "slot": "1",
+      "id": "mu5rxfbl4gomlf"
+    },
+    {
+      "local": "",
+      "tipo": "extra",
+      "semana": "2026-09-21",
+      "titulo": "Seminário de apresentação dos projetos de intervenção - CAO I 2026",
+      "slot": "2",
+      "dia": "4",
+      "id": "mu5rxg595j6fb1"
+    },
+    {
+      "slot": "3",
+      "local": "",
+      "dia": "4",
+      "titulo": "Seminário de apresentação dos projetos de intervenção - CAO I 2026",
+      "semana": "2026-09-21",
+      "tipo": "extra",
+      "id": "mu5rxgz98d2b9m"
+    },
+    {
+      "slot": "4",
+      "dia": "4",
+      "id": "mu5rxhtx6tnwyt",
+      "local": "",
+      "semana": "2026-09-21",
+      "titulo": "Seminário de apresentação dos projetos de intervenção - CAO I 2026",
+      "tipo": "extra"
+    },
+    {
+      "slot": "1",
+      "dia": "5",
+      "id": "mu5rxirmmdqr8d",
+      "local": "",
+      "tipo": "disciplina",
+      "semana": "2026-09-21",
+      "disciplinaId": "mu5mswvvfrzi34"
+    },
+    {
+      "slot": "2",
+      "dia": "5",
+      "local": "",
+      "disciplinaId": "mu5mswvvfrzi34",
+      "semana": "2026-09-21",
+      "id": "mu5rxkbj6gmp7d",
+      "tipo": "disciplina"
+    },
+    {
+      "slot": "3",
+      "dia": "1",
+      "id": "mu5s6m9w43k9b2",
+      "semana": "2026-09-14",
+      "local": "",
+      "tipo": "disciplina",
+      "disciplinaId": "mu5mswvvfrzi34"
+    },
+    {
+      "slot": "4",
+      "local": "",
+      "dia": "1",
+      "id": "mu5s6of590tal6",
+      "semana": "2026-09-14",
+      "tipo": "disciplina",
+      "disciplinaId": "mu5mswvvfrzi34"
+    },
+    {
+      "dia": "2",
+      "id": "mu5s6px0dor771",
+      "slot": "1",
+      "disciplinaId": "mu5mswvvcks7le",
+      "local": "",
+      "tipo": "disciplina",
+      "semana": "2026-09-14"
+    },
+    {
+      "slot": "2",
+      "dia": "2",
+      "semana": "2026-09-14",
+      "id": "mu5s6quzn7ocla",
+      "disciplinaId": "mu5mswvvcks7le",
+      "local": "",
+      "tipo": "disciplina"
+    },
+    {
+      "slot": "1",
+      "id": "mu5s6rt0yhr1st",
+      "semana": "2026-09-14",
+      "tipo": "disciplina",
+      "dia": "3",
+      "disciplinaId": "mu5mswvvtxldg8",
+      "local": ""
+    },
+    {
+      "local": "",
+      "tipo": "disciplina",
+      "semana": "2026-09-14",
+      "id": "mu5s6sqqloe23x",
+      "disciplinaId": "mu5mswvvtxldg8",
+      "dia": "3",
+      "slot": "2"
+    },
+    {
+      "slot": "3",
+      "dia": "3",
+      "semana": "2026-09-14",
+      "id": "mu5s6tovvcf242",
+      "local": "",
+      "disciplinaId": "mu5mswvve2w0ss",
+      "tipo": "disciplina"
+    },
+    {
+      "dia": "3",
+      "id": "mu5s6umpg1kt9s",
+      "tipo": "disciplina",
+      "slot": "4",
+      "local": "",
+      "disciplinaId": "mu5mswvve2w0ss",
+      "semana": "2026-09-14"
+    },
+    {
+      "disciplinaId": "mu5mswvv9a1y6z",
+      "slot": "1",
+      "id": "mu5s6vkxol1oqh",
+      "tipo": "disciplina",
+      "dia": "4",
+      "local": "",
+      "semana": "2026-09-14"
+    },
+    {
+      "disciplinaId": "mu5mswvv9a1y6z",
+      "semana": "2026-09-14",
+      "slot": "2",
+      "local": "",
+      "id": "mu5s6x42wl1pwi",
+      "tipo": "disciplina",
+      "dia": "4"
+    },
+    {
+      "slot": "3",
+      "id": "mu5s6y1ue7xfr0",
+      "dia": "4",
+      "semana": "2026-09-14",
+      "disciplinaId": "mu5mswvv875cqm",
+      "tipo": "disciplina",
+      "local": ""
+    },
+    {
+      "id": "mu5s6yzo6ddgds",
+      "tipo": "disciplina",
+      "semana": "2026-09-14",
+      "dia": "4",
+      "disciplinaId": "mu5mswvv875cqm",
+      "local": "",
+      "slot": "4"
+    },
+    {
+      "tipo": "extra",
+      "titulo": "VAGO",
+      "semana": "2026-09-14",
+      "local": "",
+      "id": "mu5s7buyqvzw9u",
+      "dia": "1",
+      "slot": "1"
+    },
+    {
+      "slot": "2",
+      "semana": "2026-09-14",
+      "titulo": "VAGO",
+      "dia": "1",
+      "local": "",
+      "id": "mu5s7gvvft8vf4",
+      "tipo": "extra"
+    },
+    {
+      "tipo": "extra",
+      "id": "mu5s7r4kllkwme",
+      "local": "",
+      "dia": "2",
+      "semana": "2026-09-14",
+      "titulo": "VAGO",
+      "slot": "3"
+    },
+    {
+      "slot": "4",
+      "dia": "2",
+      "id": "mu5s7uyofzw13h",
+      "tipo": "extra",
+      "local": "",
+      "semana": "2026-09-14",
+      "titulo": "VAGO"
+    },
+    {
+      "slot": "1",
+      "dia": "5",
+      "local": "",
+      "tipo": "extra",
+      "titulo": "VAGO",
+      "semana": "2026-09-14",
+      "id": "mu5s80d0o9z9hs"
+    },
+    {
+      "slot": "2",
+      "id": "mu5s84d7czaka7",
+      "tipo": "extra",
+      "dia": "5",
+      "semana": "2026-09-14",
+      "titulo": "VAGO",
+      "local": ""
+    },
+    {
+      "tipo": "extra",
+      "local": "",
+      "id": "mu5s87pd83izgi",
+      "semana": "2026-09-14",
+      "titulo": "VAGO",
+      "dia": "5",
+      "slot": "3"
+    },
+    {
+      "titulo": "VAGO",
+      "semana": "2026-09-14",
+      "local": "",
+      "tipo": "extra",
+      "dia": "5",
+      "slot": "4",
+      "id": "mu5s8bj9sxct24"
+    }
+  ]
+}
